@@ -1,0 +1,576 @@
+openapi: '3.0.0'
+info:
+  title: JustFaaS Gateway APIs
+  description: JustFaaS API documentation
+  version: "0.2.0"
+  license:
+    name: Apache 2.0
+servers:
+  - url: "http://gateway.faas.svc.cluster.local:8080/apis/"
+paths:
+  # system
+  /system/info:
+    get:
+      summary: Gets information about FaaS and the provider where it's installed
+      tags:
+        - system
+      responses:
+        '200':
+          description: FaaS and provider information.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  provider:
+                    $ref: "#/components/schemas/faas-provider"
+                  workspace:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        example: default
+                      gatewayVersion:
+                        type: string
+                        example: 0.1.0
+  # functions
+  /functions/:
+    get:
+      summary: Gets a list of deployed functions
+      tags:
+        - functions
+      parameters:
+        - in: query
+          name: ns
+          description: Deployed functions namespace
+          schema:
+            type: string
+            example: default
+      responses:
+        '204':
+          description: No content
+        '200':
+          description: List of functions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/function"
+    post:
+      summary: Deploys a new function
+      tags:
+        - functions
+      parameters:
+        - in: query
+          name: dryRun
+          description: Submit server-side request without persisting the resource
+          schema:
+            type: boolean
+            example: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/function"
+          text/yaml:
+            schema:
+              $ref: "#/components/schemas/function"
+      responses:
+        '201':
+          description: Deployed function
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/function"
+  /functions/{ns}/{name}:
+    get:
+      summary: Gets a deployed function
+      tags:
+        - functions
+      parameters:
+        - in: path
+          name: ns
+          schema:
+            type: string
+            example: default
+          required: true
+          description: Deployed namespace
+        - in: path
+          name: name
+          schema:
+            type: string
+            example: hello
+          required: true
+          description: Function name
+      responses:
+        '404':
+          description: Not found
+        '200':
+          description: Deployed function
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/function"
+    put:
+      summary: Replaces a deployed function
+      tags:
+        - functions
+      parameters:
+        - in: path
+          name: ns
+          schema:
+            type: string
+            example: default
+          required: true
+          description: Deployed namespace
+        - in: path
+          name: name
+          schema:
+            type: string
+            example: hello
+          required: true
+          description: Function name
+        - in: query
+          name: dryRun
+          description: Submit server-side request without persisting the resource
+          schema:
+            type: boolean
+            example: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/function"
+          text/yaml:
+            schema:
+              $ref: "#/components/schemas/function"
+      responses:
+        '200':
+          description: Deployed function
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/function"
+    patch:
+      summary: Patches a deployed function
+      tags:
+        - functions
+      parameters:
+        - in: path
+          name: ns
+          schema:
+            type: string
+            example: default
+          required: true
+          description: Deployed namespace
+        - in: path
+          name: name
+          schema:
+            type: string
+            example: hello
+          required: true
+          description: Function name
+        - in: query
+          name: dryRun
+          description: Submit server-side request without persisting the resource
+          schema:
+            type: boolean
+            example: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/function"
+          text/yaml:
+            schema:
+              $ref: "#/components/schemas/function"
+      responses:
+        '200':
+          description: Deployed function
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/function"
+    delete:
+      summary: Removes a deployed function
+      tags:
+        - functions
+      parameters:
+        - in: path
+          name: ns
+          schema:
+            type: string
+            example: default
+          required: true
+          description: Deployed namespace
+        - in: path
+          name: name
+          schema:
+            type: string
+            example: hello
+          required: true
+          description: Function name
+        - in: query
+          name: dryRun
+          description: Submit server-side request without persisting the resource
+          schema:
+            type: boolean
+            example: false
+      responses:
+        '202':
+          description: Accepted
+  /functions/{name}:
+    get:
+      summary: Gets a deployed function from default namespace
+      tags:
+        - functions [workspaces]
+      parameters:
+        - in: path
+          name: name
+          schema:
+            type: string
+            example: hello
+          required: true
+          description: Function name
+      responses:
+        '404':
+          description: Not found
+        '200':
+          description: Deployed function
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/function"
+    put:
+      summary: Replaces a deployed function from default namespace
+      tags:
+        - functions [workspaces]
+      parameters:
+        - in: path
+          name: name
+          schema:
+            type: string
+            example: hello
+          required: true
+          description: Function name
+        - in: query
+          name: dryRun
+          description: Submit server-side request without persisting the resource
+          schema:
+            type: boolean
+            example: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/function"
+          text/yaml:
+            schema:
+              $ref: "#/components/schemas/function"
+      responses:
+        '200':
+          description: Deployed function
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/function"
+    patch:
+      summary: Patches a deployed function from default namespace
+      tags:
+        - functions [workspaces]
+      parameters:
+        - in: path
+          name: name
+          schema:
+            type: string
+            example: hello
+          required: true
+          description: Function name
+        - in: query
+          name: dryRun
+          description: Submit server-side request without persisting the resource
+          schema:
+            type: boolean
+            example: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/function"
+          text/yaml:
+            schema:
+              $ref: "#/components/schemas/function"
+      responses:
+        '200':
+          description: Deployed function
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/function"
+    delete:
+      summary: Removes a deployed function from default namespace
+      tags:
+        - functions [workspaces]
+      parameters:
+        - in: path
+          name: name
+          schema:
+            type: string
+            example: hello
+          required: true
+          description: Function name
+        - in: query
+          name: dryRun
+          description: Submit server-side request without persisting the resource
+          schema:
+            type: boolean
+            example: false
+      responses:
+        '202':
+          description: Accepted
+  # workspaces
+  /workspaces/:
+    get:
+      summary: Gets a list of deployed workspaces
+      tags:
+        - workspaces
+      responses:
+        '204':
+          description: No content
+        '200':
+          description: List of workspaces
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/workspace"
+    post:
+      summary: Deploys a new workspace
+      tags:
+        - workspaces
+      parameters:
+        - in: query
+          name: dryRun
+          description: Submit server-side request without persisting the resource
+          schema:
+            type: boolean
+            example: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/workspace"
+          text/yaml:
+            schema:
+              $ref: "#/components/schemas/workspace"
+      responses:
+        '201':
+          description: Deployed workspace
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/workspace"
+  /workspaces/{name}:
+    get:
+      summary: Gets a deployed workspace
+      tags:
+        - workspaces
+      parameters:
+        - in: path
+          name: name
+          schema:
+            type: string
+            example: my-workspace
+          required: true
+          description: Workspace name
+      responses:
+        '404':
+          description: Not found
+        '200':
+          description: Deployed workspace
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/workspace"
+    put:
+      summary: Replaces a deployed workspace
+      tags:
+        - workspaces
+      parameters:
+        - in: path
+          name: name
+          schema:
+            type: string
+            example: my-workspace
+          required: true
+          description: Workspace name
+        - in: query
+          name: dryRun
+          description: Submit server-side request without persisting the resource
+          schema:
+            type: boolean
+            example: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/workspace"
+          text/yaml:
+            schema:
+              $ref: "#/components/schemas/workspace"
+      responses:
+        '200':
+          description: Deployed workspace
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/workspace"
+    patch:
+      summary: Patches a deployed workspace
+      tags:
+        - workspaces
+      parameters:
+        - in: path
+          name: name
+          schema:
+            type: string
+            example: my-workspace
+          required: true
+          description: Workspace name
+        - in: query
+          name: dryRun
+          description: Submit server-side request without persisting the resource
+          schema:
+            type: boolean
+            example: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/workspace"
+          text/yaml:
+            schema:
+              $ref: "#/components/schemas/workspace"
+      responses:
+        '200':
+          description: Deployed workspace
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/workspace"
+    delete:
+      summary: Removes a deployed workspace
+      tags:
+        - workspaces
+      parameters:
+        - in: path
+          name: name
+          schema:
+            type: string
+            example: my-workspace
+          required: true
+          description: Workspace name
+        - in: query
+          name: dryRun
+          description: Submit server-side request without persisting the resource
+          schema:
+            type: boolean
+            example: false
+      responses:
+        '202':
+          description: Accepted
+components:
+  schemas:
+    faas-provider:
+      type: object
+      properties:
+        name:
+          type: string
+          example: kubernetes
+        version:
+          type: object
+          properties:
+            buildDate:
+              type: string
+              example: "2023-01-18T15:51:25Z"
+            compiler:
+              type: string
+              example: gc
+            gitCommit:
+              type: string
+              example: "8f94681cd294aa8cfd3407b8191f6c70214973a4"
+            gitTreeState:
+              type: string
+              example: clean
+            gitVersion:
+              type: string
+              example: "v1.26.1"
+            goVersion:
+              type: string
+              example: "go1.19.5"
+            major:
+              type: string
+              example: "1"
+            minor:
+              type: string
+              example: "26"
+            platform:
+              type: string
+              example: "linux/arm64"
+    function:
+      type: object
+      properties:
+        apiVersion:
+          type: string
+          example: justfaas.com/v1alpha1
+        kind:
+          type: string
+          example: Function
+        metadata:
+          type: object
+          properties:
+            name:
+              type: string
+              example: hello
+            namespace:
+              type: string
+              example: default
+        spec:
+          type: object
+          properties:
+            image:
+              type: string
+              example: gcr.io/google-samples/hello-app:1.0
+            port:
+              type: integer
+              example: 8080
+    workspace:
+      type: object
+      properties:
+        apiVersion:
+          type: string
+          example: justfaas.com/v1alpha1
+        kind:
+          type: string
+          example: Workspace
+        metadata:
+          type: object
+          properties:
+            name:
+              type: string
+              example: my-workspace
+            namespace:
+              type: string
+              example: faas
+        spec:
+          type: object
