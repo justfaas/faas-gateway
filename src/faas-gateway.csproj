@@ -9,8 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CloudNative.CloudEvents.AspNetCore" Version="2.6.0" />
-    <PackageReference Include="CloudNative.CloudEvents.SystemTextJson" Version="2.6.0" />
     <PackageReference Include="JustFaaS.Kubernetes.Models" Version="0.1.1" />
     <PackageReference Include="KubernetesClient" Version="10.0.31" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />

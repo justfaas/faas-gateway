@@ -1,6 +1,4 @@
 using System.Text.Json;
-using CloudNative.CloudEvents;
-using CloudNative.CloudEvents.Http;
 using Microsoft.Extensions.Options;
 
 internal static class ProxyRoutes
@@ -8,7 +6,6 @@ internal static class ProxyRoutes
     private const int servicePortDefault = 8080;
     private static string namespaceDefault = "default";
     private static bool isInsideWorkspace = false;
-    private static readonly CloudEventFormatter formatter = new CloudNative.CloudEvents.SystemTextJson.JsonEventFormatter();
 
     public static IEndpointRouteBuilder MapProxyRoutes( this IEndpointRouteBuilder builder )
     {

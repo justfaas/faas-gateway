@@ -1,4 +1,4 @@
-public sealed class FunctionInvoke
+public sealed class FunctionCall
 {
     public Dictionary<string, string> Arguments { get; set; } = new Dictionary<string, string>();
     public Dictionary<string, string> Metadata { get; init; } = new Dictionary<string, string>();

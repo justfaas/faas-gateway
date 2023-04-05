@@ -1,13 +1,11 @@
+using System.Text;
 using System.Text.Json;
-using CloudNative.CloudEvents;
-using CloudNative.CloudEvents.Http;
 using Microsoft.Extensions.Options;
 
 internal static class ProxyAsyncRoutes
 {
     private static string namespaceDefault = "default";
     private static bool isInsideWorkspace = false;
-    private static readonly CloudEventFormatter formatter = new CloudNative.CloudEvents.SystemTextJson.JsonEventFormatter();
 
     public static IEndpointRouteBuilder MapProxyAsyncRoutes( this IEndpointRouteBuilder builder )
     {
@@ -59,24 +57,19 @@ internal static class ProxyAsyncRoutes
         {
             var httpClient = httpClientFactory.CreateClient();
 
-            var body = await httpRequest.CopyToFunctionInvokeAsync( ns, name );
+            var functionCall = await httpRequest.CopyToFunctionCallAsync( ns, name );
 
-            var cloudEvent = new CloudEvent
-            {
-                Id = Guid.NewGuid().ToString( "N" ),
-                Source = new Uri( "http://gateway.faas.svc.cluster.local:8080/cloudevents/spec/function" ),
-                Type = "com.justfaas.function.invoked",
-                Subject = $"{ns}/{name}",
-                Data = body,
-                DataContentType = "application/json",
-            };
+            var json = JsonSerializer.Serialize( functionCall );
+            var httpContent = new StringContent( json, Encoding.UTF8, "application/json" );
+            var gatewayNamespace = isInsideWorkspace ? namespaceDefault : "faas";
+
+            httpContent.Headers.Add( "X-Event-Source", $"http://gateway.{gatewayNamespace}" );
+            httpContent.Headers.Add( "X-Event-Type", "com.justfaas.function.invoked" );
 
             if ( httpRequest.Headers.TryGetValue( "X-Webhook-Url", out var webhookUrl ) )
             {
-                cloudEvent.SetAttributeFromString( "webhookurl", webhookUrl.ToString() );
+                httpContent.Headers.Add( "X-Event-Webhook-Url", webhookUrl.ToString() );
             }
-
-            var httpContent = cloudEvent.ToHttpContent( ContentMode.Structured, formatter );
 
             await httpClient.PostAsync( $"http://events.faas.svc.cluster.local:8080/apis/events", httpContent );
 
