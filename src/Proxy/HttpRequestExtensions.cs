@@ -4,6 +4,15 @@ internal static class HttpRequestExtensions
 {
     public static async Task<HttpRequestMessage> RewriteProxyRequestAsync( this HttpRequest request, string url )
     {
+        // copy query parameters
+        if ( request.QueryString.HasValue )
+        {
+            url = string.Concat(
+                url,
+                request.QueryString.ToString()
+            );
+        }
+
         var message = new HttpRequestMessage( new HttpMethod( request.Method ), url );
 
         // copy headers
