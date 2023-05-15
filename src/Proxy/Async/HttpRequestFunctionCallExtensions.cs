@@ -6,25 +6,13 @@ internal static class HttpRequestFunctionCallExtensions
 
         var path = httpRequest.GetPathWithoutProxy( ns, name );
 
-        // split arguments (if any)
-        if ( path.Contains( '?' ) )
+        // copy arguments (if any)
+        foreach ( var arg in httpRequest.Query )
         {
-            var args = path.Split( '?', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
-
-            path = args.First();
-            args = args[1].Split( '&', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
-
-            foreach ( var arg in args )
-            {
-                var values = arg.Split( '=', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
-
-                invoke.Arguments.Add(
-                    values.First(),
-                    values.Length > 1
-                        ? values[1]
-                        : string.Empty
-                );
-            }
+            invoke.Arguments.Add(
+                arg.Key,
+                arg.Value.ToString()
+            );
         }
 
         invoke.Metadata.Add( "HTTP_METHOD", httpRequest.Method );
