@@ -1,6 +1,5 @@
 ### Builder
-##FROM mcr.microsoft.com/dotnet/sdk:7.0 as build
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/nightly/sdk:8.0-preview AS build
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:7.0 as build
 ARG TARGETARCH
 WORKDIR /app
 
@@ -8,10 +7,14 @@ RUN apt update && apt install libxml2-utils -y
 
 # restore dependencies; use nuget config for private dependencies
 COPY ./src/faas-gateway.csproj ./
-COPY add-nuget-config.sh /tmp/
-RUN chmod u+x /tmp/add-nuget-config.sh
-RUN --mount=type=secret,id=nuget.config /tmp/add-nuget-config.sh nuget.config \
-    dotnet restore -a $TARGETARCH
+RUN --mount=type=secret,id=GITHUB_TOKEN \
+    dotnet nuget add source \
+        --store-password-in-clear-text \
+        -n justfaas \
+        -u justfaas \
+        -p $(cat /run/secrets/GITHUB_TOKEN) \
+        https://nuget.pkg.github.com/justfaas/index.json
+RUN dotnet restore -a $TARGETARCH
 
 COPY ./src/. ./
 RUN dotnet publish -c release -a $TARGETARCH -o dist faas-gateway.csproj
