@@ -1,6 +1,7 @@
 ### Builder
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:7.0 as build
 ARG TARGETARCH
+ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
 WORKDIR /app
 
 RUN apt update && apt install libxml2-utils -y
