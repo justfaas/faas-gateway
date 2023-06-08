@@ -68,10 +68,12 @@ internal static class ProxyRoutes
 
             var content = await response.Content.ReadAsByteArrayAsync();
             var contentType = response.Content.Headers.ContentType?.ToString();
+            var headers = response.Headers;
 
             return new CustomHttpResult(
                   statusCode: (int)response.StatusCode
                 , contentType: contentType
+                , headers: headers
                 , content: new ReadOnlyMemory<byte>( content )
             );
         }
