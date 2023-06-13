@@ -34,7 +34,7 @@ jobs:
     #     echo ::set-output name=tags::${TAGS}
     - id: prep
       run: |
-        DOCKER_IMAGE=gcr.io/justfaas/gateway
+        DOCKER_IMAGE=ghcr.io/justfaas/gateway
         VERSION=${GITHUB_REF#refs/tags/}
         VERSION=${VERSION#v}
         TAGS="${DOCKER_IMAGE}:${VERSION},${DOCKER_IMAGE}:latest"
