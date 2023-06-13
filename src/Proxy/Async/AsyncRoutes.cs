@@ -14,7 +14,7 @@ internal static class ProxyAsyncRoutes
         proxy.AddEndpointFilter<MetricsEndpointFilter>();
 
         proxy.Map( "/{ns}/{name}/{*all}", PublishAsync );
-        proxy.Map( "/{name}/{*all}", PublishAsync );
+        //proxy.Map( "/{name}/{*all}", PublishAsync );
 
         var options = builder.ServiceProvider.GetRequiredService<IOptions<GatewayOptions>>()
             .Value;
@@ -26,13 +26,13 @@ internal static class ProxyAsyncRoutes
     }
 
     private static async Task<IResult> PublishAsync( HttpRequest httpRequest
-        , string? ns
+        , string ns
         , string name
         , ILoggerFactory loggerFactory
         , IHttpClientFactory httpClientFactory
         , IGatewayMetrics metrics )
     {
-        ns = ns ?? namespaceDefault;
+        //ns = ns ?? namespaceDefault;
 
         if ( isInsideWorkspace && !ns.Equals( namespaceDefault ) )
         {
