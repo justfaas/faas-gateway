@@ -38,17 +38,14 @@ jobs:
         VERSION=${GITHUB_REF#refs/tags/}
         VERSION=${VERSION#v}
         TAGS="${DOCKER_IMAGE}:${VERSION},${DOCKER_IMAGE}:latest"
-        echo ::set-output name=version::${VERSION}
-        echo ::set-output name=tags::${TAGS}
-    - name: Build and push Docker image for Raspberry Pi
+        echo "version=${VERSION}" >> $GITHUB_OUTPUT
+        echo "tags=${TAGS}" >> $GITHUB_OUTPUT
+    - name: Build and push Docker image
       id: docker_build
       uses: docker/build-push-action@v4
       with:
-        push: false
+        push: true
         tags: ${{ steps.prep.outputs.tags }}
-        # tags: |
-        #   ghcr.io/justfaas/gateway:latest
-        #   ghcr.io/justfaas/gateway:${{ github.ref_name }}
         platforms: linux/amd64,linux/arm64
         secrets: |
           GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
@@ -57,4 +54,5 @@ jobs:
       with:
         draft: true
         tag_name: ${{ github.ref_name }}
-        body: ${{ steps.changelog.outputs.changes }}
+        generate_release_notes: true
+        token: ${{ secrets.GITHUB_TOKEN }}
