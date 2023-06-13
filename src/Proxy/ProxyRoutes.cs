@@ -12,7 +12,7 @@ internal static class ProxyRoutes
         var proxy = builder.MapGroup( "/proxy" );
 
         proxy.Map( "/{ns}/{name}/{*all}", SendAsync );
-        proxy.Map( "/{name}/{*all}", SendAsync );
+        //proxy.Map( "/{name}/{*all}", SendAsync );
 
         var options = builder.ServiceProvider.GetRequiredService<IOptions<GatewayOptions>>()
             .Value;
@@ -24,14 +24,14 @@ internal static class ProxyRoutes
     }
 
     private static async Task<IResult> SendAsync( HttpContext httpContext
-        , string? ns
+        , string ns
         , string name
         , ILoggerFactory loggerFactory
         , ProxyHttpClient proxy
         , IGatewayMetrics metrics )
     {
         // set default namespace if undefined
-        ns = ns ?? namespaceDefault;
+        //ns = ns ?? namespaceDefault;
 
         if ( isInsideWorkspace && !ns.Equals( namespaceDefault ) )
         {
