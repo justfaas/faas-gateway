@@ -2,7 +2,11 @@ internal static class HttpRequestFunctionCallExtensions
 {
     public static async Task<FunctionCall> CopyToFunctionCallAsync( this HttpRequest httpRequest, string ns, string name )
     {
-        var invoke = new FunctionCall();
+        var invoke = new FunctionCall
+        {
+            Namespace = ns,
+            Name = name
+        };
 
         var path = httpRequest.GetPathWithoutProxy( ns, name );
 
