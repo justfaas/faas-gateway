@@ -1,4 +1,5 @@
 using System.Net.Http.Headers;
+using System.Net.Sockets;
 
 internal class ProxyHttpClient
 {
@@ -20,7 +21,7 @@ internal class ProxyHttpClient
         , CancellationToken cancellationToken )
     {
         var url = $"http://{serviceName}.{serviceNamespace}.svc.cluster.local:{servicePort}{path}";
-        var requestTimeout = TimeSpan.FromSeconds( 10 );
+        var requestTimeout = TimeSpan.FromSeconds( 30 );
 
         if ( source.Headers.TryGetValue( "X-Function-Timeout", out var timeoutDuration ) )
         {
@@ -39,6 +40,7 @@ internal class ProxyHttpClient
         #endif
 
         HttpResponseMessage? response = null;
+        var isConnectionError = false;
         var taskExecute = async () =>
         {
             // rewrite request message
@@ -50,6 +52,7 @@ internal class ProxyHttpClient
             // send request
             try
             {
+                isConnectionError = false;
                 using ( var tokenSource = new CancellationTokenSource( requestTimeout ) )
                 {
                     response = await httpClient.SendAsync( message, HttpCompletionOption.ResponseHeadersRead, tokenSource.Token );
@@ -58,18 +61,26 @@ internal class ProxyHttpClient
                 // update function service metrics
                 metrics.ProxyCompletedRequestsTotal( serviceNamespace, serviceName ).Inc();
             }
-            catch ( Exception )
+            catch ( TaskCanceledException )
             {
+                response = null;
+            }
+            catch ( Exception ex )
+            {
+                isConnectionError = ( ex.InnerException is SocketException );
                 response = null;
             }
         };
 
         await taskExecute();
 
-        var maxAttempts = 20;
+        var maxAttempts = 5;
         var attempts = 0;
 
-        while ( response == null || response?.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable )
+        /*
+        retries only occur for connection errors (e.g. socket exception) or 503 errors (service unavailable)
+        */
+        while ( isConnectionError && ( response == null || response?.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable ) )
         {
             if ( cancellationToken.IsCancellationRequested )
             {
