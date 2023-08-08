@@ -77,6 +77,21 @@ internal static class ProxyRoutes
                 , content: new ReadOnlyMemory<byte>( content )
             );
         }
+        catch ( TimeoutException )
+        {
+            logger.LogWarning( $"Function {ns}/{name} timed out." );
+
+            /*
+            Timeouts return a 202 response to the caller.
+            This is because the function may still be running.
+            */
+
+            return Results.Accepted();
+        }
+        catch ( ConnectionTimeoutException )
+        {
+            logger.LogWarning( $"Unable to connect to {ns}/{name}." );
+        }
         catch ( Exception ex )
         {
             logger.LogError( ex, ex.Message );

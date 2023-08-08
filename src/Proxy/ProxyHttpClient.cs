@@ -21,7 +21,7 @@ internal class ProxyHttpClient
         , CancellationToken cancellationToken )
     {
         var url = $"http://{serviceName}.{serviceNamespace}.svc.cluster.local:{servicePort}{path}";
-        var requestTimeout = TimeSpan.FromSeconds( 30 );
+        var requestTimeout = TimeSpan.FromSeconds( 10 );
 
         if ( source.Headers.TryGetValue( "X-Function-Timeout", out var timeoutDuration ) )
         {
@@ -40,7 +40,6 @@ internal class ProxyHttpClient
         #endif
 
         HttpResponseMessage? response = null;
-        var isConnectionError = false;
         var taskExecute = async () =>
         {
             // rewrite request message
@@ -52,7 +51,6 @@ internal class ProxyHttpClient
             // send request
             try
             {
-                isConnectionError = false;
                 using ( var tokenSource = new CancellationTokenSource( requestTimeout ) )
                 {
                     response = await httpClient.SendAsync( message, HttpCompletionOption.ResponseHeadersRead, tokenSource.Token );
@@ -63,11 +61,13 @@ internal class ProxyHttpClient
             }
             catch ( TaskCanceledException )
             {
-                response = null;
+                /*
+                timeout or hard timeout (task is canceled)
+                */
+                throw new TimeoutException();
             }
-            catch ( Exception ex )
+            catch ( Exception )
             {
-                isConnectionError = ( ex.InnerException is SocketException );
                 response = null;
             }
         };
@@ -80,7 +80,7 @@ internal class ProxyHttpClient
         /*
         retries only occur for connection errors (e.g. socket exception) or 503 errors (service unavailable)
         */
-        while ( isConnectionError && ( response == null || response?.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable ) )
+        while ( response == null || response?.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable )
         {
             if ( cancellationToken.IsCancellationRequested )
             {
@@ -102,7 +102,7 @@ internal class ProxyHttpClient
 
         if ( response == null )
         {
-            throw new TimeoutException();
+            throw new ConnectionTimeoutException();
         }
 
         return ( response );
