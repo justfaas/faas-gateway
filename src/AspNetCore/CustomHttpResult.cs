@@ -36,7 +36,7 @@ internal class CustomHttpResult : IResult
 
             try
             {
-                httpContext.Response.Headers.Add( header.Key, header.Value.ToArray() );
+                httpContext.Response.Headers.Append( header.Key, header.Value.ToArray() );
             }
             catch {}
         }

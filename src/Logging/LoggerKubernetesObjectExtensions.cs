@@ -4,16 +4,16 @@ using k8s.Models;
 internal static class LoggerKubernetesObjectExtensions
 {
     public static void LogObjectCreated( this ILogger logger, string kind, string name )
-        => logger.LogInformation( $"{kind}/{name} created." );
+        => logger.LogInformation( "{kind}/{name} created.", kind, name );
 
     public static void LogObjectModified( this ILogger logger, string kind, string name )
-        => logger.LogInformation( $"{kind}/{name} configured." );
+        => logger.LogInformation( "{kind}/{name} configured.", kind, name );
 
     public static void LogObjectUnchanged( this ILogger logger, string kind, string name )
-        => logger.LogInformation( $"{kind}/{name} unchanged." );
+        => logger.LogInformation( "{kind}/{name} unchanged.", kind, name );
 
     public static void LogObjectDeleted( this ILogger logger, string kind, string name )
-        => logger.LogInformation( $"{kind}/{name} deleted." );
+        => logger.LogInformation( "{kind}/{name} deleted.", kind, name );
 
     public static void LogObjectCreated<T>( this ILogger logger, string name ) where T : IKubernetesObject
         => LogObjectCreated( logger, GetEntityKind<T>(), name );

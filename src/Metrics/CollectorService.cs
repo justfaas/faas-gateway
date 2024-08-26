@@ -64,7 +64,7 @@ internal sealed class CollectorService : BackgroundService
             }
             catch ( k8s.Autorest.HttpOperationException ex )
             {
-                logger.LogWarning( "Failed to list workspaces on 'faas' namespace. " + ex.Message );
+                logger.LogWarning( "Failed to list workspaces on 'faas' namespace. {Error}", ex.Message );
 
                 // delay next attempt
                 await Task.Delay( 10000, stoppingToken );
@@ -105,7 +105,7 @@ internal sealed class CollectorService : BackgroundService
         }
         catch ( Exception ex )
         {
-            logger.LogWarning( ex.Message );
+            logger.LogWarning( "Failed to collect metrics for workspace '{workspace}'. {Error}", workspace.Name(), ex.Message );
         }
     }
 }

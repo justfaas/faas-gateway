@@ -79,7 +79,7 @@ internal static class FunctionsApiEndpoints
 
     private static async Task<IResult> GetFunctionAsync( string? ns, string name, IKubernetes client )
     {
-        ns = ns ?? namespaceDefault;
+        ns ??= namespaceDefault;
 
         if ( isInsideWorkspace && !ns.Equals( namespaceDefault ) )
         {
@@ -160,7 +160,7 @@ internal static class FunctionsApiEndpoints
 
     private static async Task<IResult> PutAppAsync( HttpRequest httpRequest, string? ns, string name, bool? dryRun, IKubernetes client )
     {
-        ns = ns ?? namespaceDefault;
+        ns ??= namespaceDefault;
 
         if ( isInsideWorkspace && !ns.Equals( namespaceDefault ) )
         {
@@ -209,7 +209,7 @@ internal static class FunctionsApiEndpoints
 
     private static async Task<IResult> PatchAppAsync( HttpRequest httpRequest, string? ns, string name, bool? dryRun, IKubernetes client )
     {
-        ns = ns ?? namespaceDefault;
+        ns ??= namespaceDefault;
 
         if ( isInsideWorkspace && !ns.Equals( namespaceDefault ) )
         {
@@ -258,7 +258,7 @@ internal static class FunctionsApiEndpoints
 
     private static async Task<IResult> DeleteAppAsync( string? ns, string name, bool? dryRun, IKubernetes client )
     {
-        ns = ns ?? namespaceDefault;
+        ns ??= namespaceDefault;
 
         if ( isInsideWorkspace && !ns.Equals( namespaceDefault ) )
         {

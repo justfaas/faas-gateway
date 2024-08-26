@@ -79,7 +79,7 @@ internal static class ProxyRoutes
         }
         catch ( TimeoutException )
         {
-            logger.LogWarning( $"Function {ns}/{name} timed out." );
+            logger.LogWarning( "Function {ns}/{name} timed out.", ns, name );
 
             /*
             Timeouts return a 202 response to the caller.
@@ -90,7 +90,7 @@ internal static class ProxyRoutes
         }
         catch ( ConnectionTimeoutException )
         {
-            logger.LogWarning( $"Unable to connect to {ns}/{name}." );
+            logger.LogWarning( "Unable to connect to {ns}/{name}.", ns, name );
         }
         catch ( Exception ex )
         {

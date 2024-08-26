@@ -95,7 +95,7 @@ internal class ProxyHttpClient
                 break;
             }
 
-            await Task.Delay( 1000 );
+            await Task.Delay( 1000, cancellationToken );
 
             await taskExecute();
         }
@@ -108,6 +108,6 @@ internal class ProxyHttpClient
         return ( response );
     }
 
-    private HttpMethod GetMethod( HttpRequest source )
-        => new HttpMethod( source.Method );
+    private static HttpMethod GetMethod( HttpRequest source )
+        => new( source.Method );
 }
