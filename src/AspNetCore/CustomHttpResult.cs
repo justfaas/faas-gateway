@@ -2,18 +2,18 @@ internal class CustomHttpResult : IResult
 {
     private readonly int statusCode;
     private readonly string? contentType;
-    private readonly System.Net.Http.Headers.HttpResponseHeaders headers;
+    private readonly Dictionary<string, IEnumerable<string>> headers;
     private readonly ReadOnlyMemory<byte> content;
 
-    private readonly string[] unsafeHeaders = new string[]
-    {
+    private readonly string[] unsafeHeaders =
+    [
         "Content-Type",
         "Content-Length",
         "Date",
         "Transfer-Encoding"
-    };
+    ];
 
-    public CustomHttpResult( int statusCode, string? contentType, System.Net.Http.Headers.HttpResponseHeaders headers, ReadOnlyMemory<byte> content )
+    public CustomHttpResult( int statusCode, string? contentType, Dictionary<string, IEnumerable<string>> headers, ReadOnlyMemory<byte> content )
     {
         this.statusCode = statusCode;
         this.contentType = contentType;
