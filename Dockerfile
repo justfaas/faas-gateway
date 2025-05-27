@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1.3
 
 # Create a stage for building the application.
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
-ENV DOTNET_CLI_TELEMETRY_OPTOUT 1
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS build
+ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
 
 COPY src /source
 
@@ -11,6 +11,7 @@ WORKDIR /source
 # This is the architecture you’re building for, which is passed in by the builder.
 # Placing it here allows the previous steps to be cached across architectures.
 ARG TARGETARCH
+ENV HOME=/tmp/${TARGETARCH}
 
 RUN apk update && apk add --no-cache libxml2-utils
 
@@ -34,7 +35,7 @@ RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \
 # runtime dependencies for the application. This often uses a different base
 # image from the build stage where the necessary files are copied from the build
 # stage.
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS final
+FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine AS final
 WORKDIR /app
 
 # Copy everything needed to run the app from the "build" stage.
