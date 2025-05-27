@@ -68,7 +68,19 @@ internal static class ProxyRoutes
 
             var content = await response.Content.ReadAsByteArrayAsync();
             var contentType = response.Content.Headers.ContentType?.ToString();
-            var headers = response.Headers;
+            //var headers = response.Headers;
+            var headers = new Dictionary<string, IEnumerable<string>>( StringComparer.OrdinalIgnoreCase );
+
+            foreach ( var header in response.Headers )
+            {
+                headers[header.Key] = header.Value;
+            }
+
+            // add content headers
+            foreach ( var header in response.Content.Headers )
+            {
+                headers[header.Key] = header.Value;
+            }
 
             return new CustomHttpResult(
                   statusCode: (int)response.StatusCode
